@@ -2,6 +2,8 @@
     'use strict';
 
     angular.module('ariaNg').factory('ariaNgCommonService', ['$window', '$location', '$timeout', 'base64', 'moment', 'SweetAlert', 'ariaNgConstants', 'ariaNgLocalizationService', function ($window, $location, $timeout, base64, moment, SweetAlert, ariaNgConstants, ariaNgLocalizationService) {
+        var ed2kUrlPattern = /^ed2k:\/\/\|file\|[^|]+\|\d+\|[0-9a-fA-F]{32}\|(?:h=[A-Za-z2-7]{32}\|)?\/(?:\|sources,[^\s|]*\|\/)?$/;
+
         var getTimeOption = function (time) {
             var name = '';
             var value = time;
@@ -157,16 +159,25 @@
                 var result = [];
 
                 for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i];
+                    var line = lines[i].trim();
 
                     if (line.match(/^(http|https|ftp|sftp):\/\/.+$/)) {
                         result.push(line);
                     } else if (line.match(/^magnet:\?.+$/)) {
                         result.push(line);
+                    } else if (line.match(ed2kUrlPattern)) {
+                        result.push(line);
                     }
                 }
 
                 return result;
+            },
+            isEd2kUrl: function (url) {
+                if (!url) {
+                    return false;
+                }
+
+                return url.trim().match(ed2kUrlPattern) !== null;
             },
             decodePercentEncodedString: function (s) {
                 if (!s) {

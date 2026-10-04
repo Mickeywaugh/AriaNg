@@ -202,7 +202,19 @@
 
         $scope.isNewTaskValid = function () {
             if (!$scope.context.uploadFile) {
-                return $scope.newTaskForm.$valid;
+                if ($scope.newTaskForm.$valid) {
+                    return true;
+                }
+
+                var urls = ariaNgCommonService.parseUrlsFromOriginInput($scope.context.urls);
+
+                for (var i = 0; i < urls.length; i++) {
+                    if (!ariaNgCommonService.isEd2kUrl(urls[i])) {
+                        return false;
+                    }
+                }
+
+                return urls.length > 0;
             }
 
             return true;
@@ -280,6 +292,6 @@
             return urls ? urls.length : 0;
         };
 
-        $rootScope.loadPromise = $timeout(function () {}, 100);
+        $rootScope.loadPromise = $timeout(function () { }, 100);
     }]);
 }());
